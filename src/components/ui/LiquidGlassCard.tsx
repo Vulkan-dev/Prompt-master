@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 const GLASS_SHADOW = "shadow-[0_0_12px_rgba(0,0,0,0.4),inset_1px_1px_1px_rgba(255,255,255,0.15)]";
 
 const liquidGlassCardVariants = cva(
-  "group relative overflow-hidden bg-card/60 backdrop-blur-xl border border-white/15 rounded-2xl transition-all duration-300 max-w-full",
+  "group relative overflow-hidden bg-card/60 backdrop-blur-xl border border-white/15 rounded-2xl transition-all duration-300 w-full max-w-full",
   {
     variants: {
       glassSize: {
-        sm: "p-3 sm:p-4",
-        default: "p-4 sm:p-6 md:p-8",
-        lg: "p-6 sm:p-8 md:p-10",
+        sm: "p-[clamp(0.75rem,1.5vw,1.5rem)]",
+        default: "p-[clamp(1rem,2.5vw,2.5rem)]",
+        lg: "p-[clamp(1.5rem,3.5vw,3.5rem)]",
       },
     },
     defaultVariants: {
@@ -43,7 +43,7 @@ export function LiquidGlassCard({
           GLASS_SHADOW
         )}
       />
-      <div className="relative z-10 w-full">{children}</div>
+      <div className="relative z-10 w-full h-full">{children}</div>
     </div>
   );
 }
@@ -62,8 +62,8 @@ export function LiquidButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 rounded-xl font-mono text-xs font-semibold tracking-wide transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer",
-        "bg-primary text-primary-foreground hover:opacity-90",
+        "relative inline-flex items-center justify-center gap-2 min-h-[clamp(42px,5vh,56px)] px-[clamp(1rem,2.2vw,2.2rem)] py-2.5 rounded-xl font-mono text-[clamp(0.75rem,1.05vw,1.05rem)] font-bold tracking-wide transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg cursor-pointer",
+        "bg-indigo-600 text-white hover:bg-indigo-500",
         className
       )}
       {...props}
