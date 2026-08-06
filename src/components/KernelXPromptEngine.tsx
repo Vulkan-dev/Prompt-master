@@ -5,7 +5,6 @@ import { scanPromptSecurity } from '../lib/heuristics';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Sparkles, ShieldCheck, CheckCircle2, Copy, RefreshCw, Zap, Eye, Split, Download, History, AlertTriangle, Trash2, X } from 'lucide-react';
@@ -14,6 +13,7 @@ import FlowField from './ui/FlowField';
 import AI_Input_Search from './ui/AI_Input_Search';
 import AITextLoading from './ui/AITextLoading';
 import FileUpload from './ui/FileUpload';
+import SmoothTab, { TabItem } from './ui/SmoothTab';
 import { LiquidGlassCard, LiquidButton } from './ui/LiquidGlassCard';
 
 interface HistoryItem {
@@ -25,11 +25,44 @@ interface HistoryItem {
   mode: string;
 }
 
+const TABS: TabItem[] = [
+  { id: 'audit', title: 'Audit & Score', icon: <Zap className="h-4 w-4 shrink-0" /> },
+  { id: 'factory', title: 'Enhancer', icon: <Sparkles className="h-4 w-4 shrink-0" /> },
+  { id: 'vision', title: 'Image to Prompt', icon: <Eye className="h-4 w-4 shrink-0" /> },
+];
+
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? "60%" : "-60%",
+    opacity: 0,
+    filter: "blur(8px)",
+    scale: 0.97,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    filter: "blur(0px)",
+    scale: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? "60%" : "-60%",
+    opacity: 0,
+    filter: "blur(8px)",
+    scale: 0.97,
+  }),
+};
+
+const tabTransition = {
+  duration: 0.4,
+  ease: [0.32, 0.72, 0, 1],
+};
+
 export default function KernelXPromptEngine() {
   const [prompt, setPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('audit');
+  const [direction, setDirection] = useState(0);
 
   // Diagnostic states
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -59,6 +92,13 @@ export default function KernelXPromptEngine() {
       console.error(e);
     }
   }, []);
+
+  const handleTabChange = (newTabId: string) => {
+    const currentIndex = TABS.findIndex((t) => t.id === activeTab);
+    const newIndex = TABS.findIndex((t) => t.id === newTabId);
+    setDirection(newIndex > currentIndex ? 1 : -1);
+    setActiveTab(newTabId);
+  };
 
   const saveHistory = (item: Omit<HistoryItem, 'id' | 'timestamp'>) => {
     const newItem: HistoryItem = {
@@ -152,7 +192,7 @@ export default function KernelXPromptEngine() {
         const base64Data = dataUrl.split(',')[1];
 
         setIsProcessing(true);
-        setActiveTab('vision');
+        handleTabChange('vision');
         try {
           const visRes = await imageToPrompt(base64Data, file.type);
           setVisionResult(visRes);
@@ -203,235 +243,253 @@ export default function KernelXPromptEngine() {
               </div>
             </header>
 
-            {/* Feature Tabs (Fluid Viewport Grid) */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-[clamp(1.5rem,3vh,3rem)]">
-              <TabsList className="grid grid-cols-1 sm:grid-cols-3 gap-[clamp(0.35rem,0.8vw,0.8rem)] bg-zinc-900/90 p-[clamp(0.35rem,0.8vw,0.75rem)] rounded-2xl border border-white/20 h-auto w-full">
-                <TabsTrigger
-                  value="audit"
-                  className="w-full flex items-center justify-center py-[clamp(0.6rem,1.4vh,1rem)] px-[clamp(0.75rem,1.5vw,1.5rem)] min-h-[clamp(42px,5vh,54px)] font-mono text-[clamp(0.75rem,1.1vw,1.1rem)] font-bold text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl transition-all shadow-md"
-                >
-                  <Zap className="h-4 w-4 mr-2 shrink-0" /> Audit & Score
-                </TabsTrigger>
-                <TabsTrigger
-                  value="factory"
-                  className="w-full flex items-center justify-center py-[clamp(0.6rem,1.4vh,1rem)] px-[clamp(0.75rem,1.5vw,1.5rem)] min-h-[clamp(42px,5vh,54px)] font-mono text-[clamp(0.75rem,1.1vw,1.1rem)] font-bold text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl transition-all shadow-md"
-                >
-                  <Sparkles className="h-4 w-4 mr-2 shrink-0" /> Enhancer
-                </TabsTrigger>
-                <TabsTrigger
-                  value="vision"
-                  className="w-full flex items-center justify-center py-[clamp(0.6rem,1.4vh,1rem)] px-[clamp(0.75rem,1.5vw,1.5rem)] min-h-[clamp(42px,5vh,54px)] font-mono text-[clamp(0.75rem,1.1vw,1.1rem)] font-bold text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl transition-all shadow-md"
-                >
-                  <Eye className="h-4 w-4 mr-2 shrink-0" /> Image to Prompt
-                </TabsTrigger>
-              </TabsList>
+            {/* Smooth Tab Bar with Sliding Indicator Pill */}
+            <SmoothTab
+              items={TABS}
+              activeTabId={activeTab}
+              onChange={handleTabChange}
+            />
 
-              {/* Input Search Console (For Audit & Enhancer) */}
-              {activeTab !== 'vision' && (
-                <div className="space-y-4">
-                  <AI_Input_Search
-                    value={prompt}
-                    onChange={setPrompt}
-                    showEnhanceToggle={activeTab === 'factory'}
-                    onSubmit={() => {
-                      if (activeTab === 'audit') handleAnalyze();
-                      else if (activeTab === 'factory') handleEnhance();
-                    }}
-                    placeholder="Enter your prompt instruction here..."
-                  />
+            {/* Input Search Console (For Audit & Enhancer) */}
+            {activeTab !== 'vision' && (
+              <div className="space-y-4">
+                <AI_Input_Search
+                  value={prompt}
+                  onChange={setPrompt}
+                  showEnhanceToggle={activeTab === 'factory'}
+                  onSubmit={() => {
+                    if (activeTab === 'audit') handleAnalyze();
+                    else if (activeTab === 'factory') handleEnhance();
+                  }}
+                  placeholder="Enter your prompt instruction here..."
+                />
 
-                  <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-                    <div className="flex items-center gap-2 text-[clamp(0.75rem,1vw,1.05rem)] font-mono text-slate-300 font-medium">
-                      <span>{prompt.length} characters</span>
-                      <span>•</span>
-                      <span>{prompt.split(/\s+/).filter(Boolean).length} words</span>
-                    </div>
+                <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+                  <div className="flex items-center gap-2 text-[clamp(0.75rem,1vw,1.05rem)] font-mono text-slate-300 font-medium">
+                    <span>{prompt.length} characters</span>
+                    <span>•</span>
+                    <span>{prompt.split(/\s+/).filter(Boolean).length} words</span>
+                  </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                      {activeTab === 'audit' && (
-                        <>
-                          <button
-                            onClick={handleAnalyze}
-                            disabled={isProcessing || !prompt.trim()}
-                            className="inline-flex items-center gap-2 px-[clamp(1.2rem,2.2vw,2.2rem)] py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-[clamp(0.75rem,1.05vw,1.05rem)] font-bold transition-all shadow-lg min-h-[clamp(42px,5vh,56px)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-                            Audit Score
-                          </button>
-
-                          <button
-                            onClick={handleOptimize}
-                            disabled={isProcessing || !prompt.trim()}
-                            className="inline-flex items-center gap-2 px-[clamp(1.2rem,2.2vw,2.2rem)] py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-[clamp(0.75rem,1.05vw,1.05rem)] font-bold transition-all min-h-[clamp(42px,5vh,56px)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <Sparkles className="h-4 w-4 text-indigo-300" />
-                            Auto-Optimize
-                          </button>
-                        </>
-                      )}
-
-                      {activeTab === 'factory' && (
+                  <div className="flex flex-wrap items-center gap-3">
+                    {activeTab === 'audit' && (
+                      <>
                         <button
-                          onClick={handleEnhance}
+                          onClick={handleAnalyze}
                           disabled={isProcessing || !prompt.trim()}
                           className="inline-flex items-center gap-2 px-[clamp(1.2rem,2.2vw,2.2rem)] py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-[clamp(0.75rem,1.05vw,1.05rem)] font-bold transition-all shadow-lg min-h-[clamp(42px,5vh,56px)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Sparkles className="h-4 w-4" />
-                          Generate Enhanced Prompt
+                          {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                          Audit Score
                         </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
 
-              {/* Loading Animation Overlay */}
-              {isProcessing && (
-                <AITextLoading
-                  texts={[
-                    "KernelX Analyzing Instruction...",
-                    "Evaluating Criteria Metrics...",
-                    "Checking Security Vulnerabilities...",
-                    "Optimizing Neural Execution...",
-                    "Formatting Final Prompt..."
-                  ]}
-                />
-              )}
-
-              {/* TAB 1: AUDIT & SCORE */}
-              <TabsContent value="audit" className="space-y-6 pt-2">
-                {analysisResult && (
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    {/* Score Card */}
-                    <LiquidGlassCard className="lg:col-span-4 flex flex-col items-center justify-center p-[clamp(1.5rem,3vw,3.5rem)] text-center space-y-4">
-                      <span className="text-[clamp(0.7rem,0.9vw,0.95rem)] font-mono uppercase tracking-widest text-slate-300 font-bold">Overall Quality Score</span>
-                      <div className="relative flex items-center justify-center w-[clamp(7rem,14vw,14rem)] h-[clamp(7rem,14vw,14rem)] rounded-full border-4 border-indigo-400 bg-indigo-500/20 shadow-xl shrink-0">
-                        <span className={`font-mono text-[clamp(2.2rem,4.5vw,4.5rem)] font-extrabold ${analysisResult.overallScore >= 80 ? 'text-emerald-400' : analysisResult.overallScore >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
-                          {analysisResult.overallScore}
-                        </span>
-                      </div>
-                      <span className="text-[clamp(0.7rem,0.9vw,0.95rem)] font-mono text-slate-300 font-medium">Evaluated on 5 dimensions</span>
-                    </LiquidGlassCard>
-
-                    {/* Diagnostic Breakdown Card */}
-                    <LiquidGlassCard className="lg:col-span-8 p-[clamp(1.2rem,2.5vw,2.8rem)] space-y-4">
-                      <h3 className="font-mono text-[clamp(0.85rem,1.1vw,1.15rem)] font-bold tracking-wider text-white uppercase border-b border-white/15 pb-3">
-                        Diagnostic Criteria Radar
-                      </h3>
-
-                      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-4">
-                        {Object.entries(analysisResult.criteria).map(([key, val]) => (
-                          <div key={key} className="p-4 rounded-xl bg-zinc-900/90 border border-white/15 space-y-2">
-                            <div className="flex justify-between font-mono text-[clamp(0.75rem,0.95vw,1vw)]">
-                              <span className="capitalize font-bold text-slate-200">{key}</span>
-                              <span className="text-indigo-300 font-extrabold">{Number(val)}/10</span>
-                            </div>
-                            <Progress value={(Number(val) / 10) * 100} className="h-2" />
-                          </div>
-                        ))}
-                      </div>
-                    </LiquidGlassCard>
-
-                    {/* Security Alert if threats detected */}
-                    {securityScan && !securityScan.isSecure && (
-                      <div className="lg:col-span-12">
-                        <Alert variant="destructive" className="bg-red-950/80 border-red-500/50 text-white">
-                          <AlertTriangle className="h-5 w-5 text-red-400" />
-                          <AlertTitle className="font-mono text-sm font-bold">Security Threat Detected</AlertTitle>
-                          <AlertDescription className="font-mono text-xs text-slate-200">
-                            {securityScan.warnings.join(' • ')}
-                          </AlertDescription>
-                        </Alert>
-                      </div>
+                        <button
+                          onClick={handleOptimize}
+                          disabled={isProcessing || !prompt.trim()}
+                          className="inline-flex items-center gap-2 px-[clamp(1.2rem,2.2vw,2.2rem)] py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-[clamp(0.75rem,1.05vw,1.05rem)] font-bold transition-all min-h-[clamp(42px,5vh,56px)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Sparkles className="h-4 w-4 text-indigo-300" />
+                          Auto-Optimize
+                        </button>
+                      </>
                     )}
 
-                    {/* Optimized Output Card */}
-                    {optimizedResult && (
-                      <LiquidGlassCard className="lg:col-span-12 p-[clamp(1.2rem,2.5vw,2.8rem)] space-y-4">
+                    {activeTab === 'factory' && (
+                      <button
+                        onClick={handleEnhance}
+                        disabled={isProcessing || !prompt.trim()}
+                        className="inline-flex items-center gap-2 px-[clamp(1.2rem,2.2vw,2.2rem)] py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-[clamp(0.75rem,1.05vw,1.05rem)] font-bold transition-all shadow-lg min-h-[clamp(42px,5vh,56px)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        Generate Enhanced Prompt
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Loading Animation Overlay */}
+            {isProcessing && (
+              <AITextLoading
+                texts={[
+                  "KernelX Analyzing Instruction...",
+                  "Evaluating Criteria Metrics...",
+                  "Checking Security Vulnerabilities...",
+                  "Optimizing Neural Execution...",
+                  "Formatting Final Prompt..."
+                ]}
+              />
+            )}
+
+            {/* Animated Tab Content Transitions */}
+            <div className="relative overflow-hidden w-full">
+              <AnimatePresence custom={direction} mode="wait">
+                {activeTab === 'audit' && (
+                  <motion.div
+                    key="audit"
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={tabTransition}
+                    className="space-y-6 pt-2 w-full"
+                  >
+                    {analysisResult && (
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        {/* Score Card */}
+                        <LiquidGlassCard className="lg:col-span-4 flex flex-col items-center justify-center p-[clamp(1.5rem,3vw,3.5rem)] text-center space-y-4">
+                          <span className="text-[clamp(0.7rem,0.9vw,0.95rem)] font-mono uppercase tracking-widest text-slate-300 font-bold">Overall Quality Score</span>
+                          <div className="relative flex items-center justify-center w-[clamp(7rem,14vw,14rem)] h-[clamp(7rem,14vw,14rem)] rounded-full border-4 border-indigo-400 bg-indigo-500/20 shadow-xl shrink-0">
+                            <span className={`font-mono text-[clamp(2.2rem,4.5vw,4.5rem)] font-extrabold ${analysisResult.overallScore >= 80 ? 'text-emerald-400' : analysisResult.overallScore >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                              {analysisResult.overallScore}
+                            </span>
+                          </div>
+                          <span className="text-[clamp(0.7rem,0.9vw,0.95rem)] font-mono text-slate-300 font-medium">Evaluated on 5 dimensions</span>
+                        </LiquidGlassCard>
+
+                        {/* Diagnostic Breakdown Card */}
+                        <LiquidGlassCard className="lg:col-span-8 p-[clamp(1.2rem,2.5vw,2.8rem)] space-y-4">
+                          <h3 className="font-mono text-[clamp(0.85rem,1.1vw,1.15rem)] font-bold tracking-wider text-white uppercase border-b border-white/15 pb-3">
+                            Diagnostic Criteria Radar
+                          </h3>
+
+                          <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,200px),1fr))] gap-4">
+                            {Object.entries(analysisResult.criteria).map(([key, val]) => (
+                              <div key={key} className="p-4 rounded-xl bg-zinc-900/90 border border-white/15 space-y-2">
+                                <div className="flex justify-between font-mono text-[clamp(0.75rem,0.95vw,1vw)]">
+                                  <span className="capitalize font-bold text-slate-200">{key}</span>
+                                  <span className="text-indigo-300 font-extrabold">{Number(val)}/10</span>
+                                </div>
+                                <Progress value={(Number(val) / 10) * 100} className="h-2" />
+                              </div>
+                            ))}
+                          </div>
+                        </LiquidGlassCard>
+
+                        {/* Security Alert if threats detected */}
+                        {securityScan && !securityScan.isSecure && (
+                          <div className="lg:col-span-12">
+                            <Alert variant="destructive" className="bg-red-950/80 border-red-500/50 text-white">
+                              <AlertTriangle className="h-5 w-5 text-red-400" />
+                              <AlertTitle className="font-mono text-sm font-bold">Security Threat Detected</AlertTitle>
+                              <AlertDescription className="font-mono text-xs text-slate-200">
+                                {securityScan.warnings.join(' • ')}
+                              </AlertDescription>
+                            </Alert>
+                          </div>
+                        )}
+
+                        {/* Optimized Output Card */}
+                        {optimizedResult && (
+                          <LiquidGlassCard className="lg:col-span-12 p-[clamp(1.2rem,2.5vw,2.8rem)] space-y-4">
+                            <div className="flex items-center justify-between border-b border-white/15 pb-4">
+                              <div className="flex items-center gap-2 text-indigo-300">
+                                <Sparkles className="h-5 w-5" />
+                                <h3 className="font-mono text-[clamp(0.95rem,1.2vw,1.3rem)] font-bold text-white">KernelX Optimized Output</h3>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button variant="outline" size="sm" onClick={() => setIsDiffModalOpen(true)} className="font-mono text-[clamp(0.75rem,0.95vw,1vw)] border-white/20 text-white hover:bg-white/10 min-h-[clamp(36px,4.5vh,46px)]">
+                                  <Split className="h-4 w-4 mr-1 text-indigo-300" /> Compare Diff
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={() => handleCopy(optimizedResult.optimizedPrompt)} className="font-mono text-[clamp(0.75rem,0.95vw,1vw)] border-white/20 text-white hover:bg-white/10 min-h-[clamp(36px,4.5vh,46px)]">
+                                  <Copy className="h-4 w-4 mr-1 text-indigo-300" /> Copy
+                                </Button>
+                              </div>
+                            </div>
+
+                            <div className="p-5 rounded-xl bg-zinc-950/90 border border-white/15 font-mono text-[clamp(0.85rem,1.1vw,1.15rem)] text-slate-100 leading-relaxed whitespace-pre-wrap">
+                              {optimizedResult.optimizedPrompt}
+                            </div>
+                          </LiquidGlassCard>
+                        )}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+
+                {activeTab === 'factory' && (
+                  <motion.div
+                    key="factory"
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={tabTransition}
+                    className="space-y-6 pt-2 w-full"
+                  >
+                    {enhancementResult && (
+                      <LiquidGlassCard className="p-[clamp(1.2rem,2.5vw,2.8rem)] space-y-4">
                         <div className="flex items-center justify-between border-b border-white/15 pb-4">
-                          <div className="flex items-center gap-2 text-indigo-300">
-                            <Sparkles className="h-5 w-5" />
-                            <h3 className="font-mono text-[clamp(0.95rem,1.2vw,1.3rem)] font-bold text-white">KernelX Optimized Output</h3>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={() => setIsDiffModalOpen(true)} className="font-mono text-[clamp(0.75rem,0.95vw,1vw)] border-white/20 text-white hover:bg-white/10 min-h-[clamp(36px,4.5vh,46px)]">
-                              <Split className="h-4 w-4 mr-1 text-indigo-300" /> Compare Diff
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleCopy(optimizedResult.optimizedPrompt)} className="font-mono text-[clamp(0.75rem,0.95vw,1vw)] border-white/20 text-white hover:bg-white/10 min-h-[clamp(36px,4.5vh,46px)]">
-                              <Copy className="h-4 w-4 mr-1 text-indigo-300" /> Copy
-                            </Button>
-                          </div>
+                          <span className="font-mono text-[clamp(0.9rem,1.15vw,1.25rem)] font-bold text-white">Production-Grade Enhanced Prompt</span>
+                          <Badge variant="outline" className="font-mono text-[clamp(0.7rem,0.9vw,0.95rem)] border-indigo-400 text-indigo-300 uppercase px-3 py-1 font-bold">
+                            {enhancementResult.category}
+                          </Badge>
                         </div>
 
                         <div className="p-5 rounded-xl bg-zinc-950/90 border border-white/15 font-mono text-[clamp(0.85rem,1.1vw,1.15rem)] text-slate-100 leading-relaxed whitespace-pre-wrap">
-                          {optimizedResult.optimizedPrompt}
+                          {enhancementResult.enhancedPrompt}
+                        </div>
+
+                        <div className="space-y-2 pt-2">
+                          <span className="text-[clamp(0.75rem,0.95vw,1vw)] font-mono text-slate-300 font-bold uppercase tracking-wider">Applied Enhancements:</span>
+                          <ul className="space-y-2 font-mono text-[clamp(0.75rem,0.95vw,1vw)] text-slate-200">
+                            {enhancementResult.improvements.map((imp, idx) => (
+                              <li key={idx} className="flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                                <span>{imp}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </LiquidGlassCard>
                     )}
-                  </div>
-                )}
-              </TabsContent>
-
-              {/* TAB 2: ENHANCER */}
-              <TabsContent value="factory" className="space-y-6 pt-2">
-                {enhancementResult && (
-                  <LiquidGlassCard className="p-[clamp(1.2rem,2.5vw,2.8rem)] space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/15 pb-4">
-                      <span className="font-mono text-[clamp(0.9rem,1.15vw,1.25rem)] font-bold text-white">Production-Grade Enhanced Prompt</span>
-                      <Badge variant="outline" className="font-mono text-[clamp(0.7rem,0.9vw,0.95rem)] border-indigo-400 text-indigo-300 uppercase px-3 py-1 font-bold">
-                        {enhancementResult.category}
-                      </Badge>
-                    </div>
-
-                    <div className="p-5 rounded-xl bg-zinc-950/90 border border-white/15 font-mono text-[clamp(0.85rem,1.1vw,1.15rem)] text-slate-100 leading-relaxed whitespace-pre-wrap">
-                      {enhancementResult.enhancedPrompt}
-                    </div>
-
-                    <div className="space-y-2 pt-2">
-                      <span className="text-[clamp(0.75rem,0.95vw,1vw)] font-mono text-slate-300 font-bold uppercase tracking-wider">Applied Enhancements:</span>
-                      <ul className="space-y-2 font-mono text-[clamp(0.75rem,0.95vw,1vw)] text-slate-200">
-                        {enhancementResult.improvements.map((imp, idx) => (
-                          <li key={idx} className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                            <span>{imp}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </LiquidGlassCard>
-                )}
-              </TabsContent>
-
-              {/* TAB 3: IMAGE TO PROMPT */}
-              <TabsContent value="vision" className="space-y-6 pt-2">
-                <FileUpload onUploadSuccess={handleFileUpload} />
-
-                {imagePreview && (
-                  <LiquidGlassCard className="p-4 flex items-center gap-4">
-                    <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-xl border border-white/20" />
-                    <div className="font-mono text-xs space-y-1">
-                      <p className="font-bold text-white">{imageMeta?.name}</p>
-                      <p className="text-slate-300">{imageMeta?.size}</p>
-                    </div>
-                  </LiquidGlassCard>
+                  </motion.div>
                 )}
 
-                {visionResult && (
-                  <LiquidGlassCard className="p-[clamp(1.2rem,2.5vw,2.8rem)] space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/15 pb-3">
-                      <h3 className="font-mono text-[clamp(0.9rem,1.15vw,1.25rem)] font-bold text-white">Extracted Image Generation Prompt</h3>
-                      <Button variant="outline" size="sm" onClick={() => handleCopy(visionResult.generatedPrompt)} className="font-mono text-[clamp(0.75rem,0.95vw,1vw)] border-white/20 text-white hover:bg-white/10 min-h-[clamp(36px,4.5vh,46px)]">
-                        <Copy className="h-4 w-4 mr-1 text-indigo-300" /> Copy
-                      </Button>
-                    </div>
+                {activeTab === 'vision' && (
+                  <motion.div
+                    key="vision"
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={tabTransition}
+                    className="space-y-6 pt-2 w-full"
+                  >
+                    <FileUpload onUploadSuccess={handleFileUpload} />
 
-                    <div className="p-4 rounded-xl bg-zinc-950/90 border border-white/15 font-mono text-[clamp(0.85rem,1.1vw,1.15rem)] text-slate-100 leading-relaxed">
-                      {visionResult.generatedPrompt}
-                    </div>
-                  </LiquidGlassCard>
+                    {imagePreview && (
+                      <LiquidGlassCard className="p-4 flex items-center gap-4">
+                        <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-xl border border-white/20" />
+                        <div className="font-mono text-xs space-y-1">
+                          <p className="font-bold text-white">{imageMeta?.name}</p>
+                          <p className="text-slate-300">{imageMeta?.size}</p>
+                        </div>
+                      </LiquidGlassCard>
+                    )}
+
+                    {visionResult && (
+                      <LiquidGlassCard className="p-[clamp(1.2rem,2.5vw,2.8rem)] space-y-4">
+                        <div className="flex items-center justify-between border-b border-white/15 pb-3">
+                          <h3 className="font-mono text-[clamp(0.9rem,1.15vw,1.25rem)] font-bold text-white">Extracted Image Generation Prompt</h3>
+                          <Button variant="outline" size="sm" onClick={() => handleCopy(visionResult.generatedPrompt)} className="font-mono text-[clamp(0.75rem,0.95vw,1vw)] border-white/20 text-white hover:bg-white/10 min-h-[clamp(36px,4.5vh,46px)]">
+                            <Copy className="h-4 w-4 mr-1 text-indigo-300" /> Copy
+                          </Button>
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-zinc-950/90 border border-white/15 font-mono text-[clamp(0.85rem,1.1vw,1.15rem)] text-slate-100 leading-relaxed">
+                          {visionResult.generatedPrompt}
+                        </div>
+                      </LiquidGlassCard>
+                    )}
+                  </motion.div>
                 )}
-              </TabsContent>
-            </Tabs>
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Side-by-Side Diff Modal */}
