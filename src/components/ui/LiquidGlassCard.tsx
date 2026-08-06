@@ -9,9 +9,9 @@ const liquidGlassCardVariants = cva(
   {
     variants: {
       glassSize: {
-        sm: "p-[clamp(0.75rem,1.5vw,1.5rem)]",
-        default: "p-[clamp(1rem,2.5vw,2.5rem)]",
-        lg: "p-[clamp(1.5rem,3.5vw,3.5rem)]",
+        sm: "p-3 sm:p-4",
+        default: "p-4 sm:p-6 md:p-8",
+        lg: "p-6 sm:p-8 md:p-10",
       },
     },
     defaultVariants: {
@@ -62,7 +62,7 @@ export function LiquidButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center justify-center gap-2 min-h-[clamp(42px,5vh,56px)] px-[clamp(1rem,2.2vw,2.2rem)] py-2.5 rounded-xl font-mono text-[clamp(0.75rem,1.05vw,1.05rem)] font-bold tracking-wide transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg cursor-pointer",
+        "relative inline-flex items-center justify-center gap-2 min-h-[40px] px-5 py-2 rounded-xl font-mono text-xs font-bold tracking-wide transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg cursor-pointer",
         "bg-indigo-600 text-white hover:bg-indigo-500",
         className
       )}

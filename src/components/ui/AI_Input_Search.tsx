@@ -28,8 +28,8 @@ export default function AI_Input_Search({
   const value = externalValue !== undefined ? externalValue : internalValue;
 
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
-    minHeight: 110,
-    maxHeight: 320,
+    minHeight: 90,
+    maxHeight: 240,
   });
   const [showSearch, setShowSearch] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
@@ -67,9 +67,9 @@ export default function AI_Input_Search({
           role="textbox"
           tabIndex={0}
         >
-          <div className="max-h-[clamp(200px,30vh,360px)] overflow-y-auto w-full">
+          <div className="max-h-[240px] overflow-y-auto w-full">
             <Textarea
-              className="w-full resize-none rounded-2xl rounded-b-none border-none bg-transparent px-[clamp(1rem,2vw,2rem)] py-[clamp(0.85rem,1.8vh,1.5rem)] leading-relaxed text-slate-100 placeholder:text-slate-400 font-mono text-[clamp(0.85rem,1.1vw,1.15rem)] focus-visible:ring-0"
+              className="w-full resize-none rounded-2xl rounded-b-none border-none bg-transparent px-4 sm:px-5 py-3.5 leading-relaxed text-slate-100 placeholder:text-slate-400 font-mono text-xs sm:text-sm focus-visible:ring-0"
               id="kernelx-ai-input"
               onBlur={() => setIsFocused(false)}
               onChange={(e) => handleTextChange(e.target.value)}
@@ -86,12 +86,12 @@ export default function AI_Input_Search({
             />
           </div>
 
-          <div className="min-h-[clamp(52px,6vh,64px)] py-2.5 rounded-b-2xl border-t border-white/15 bg-zinc-950/80 flex flex-wrap items-center justify-between gap-3 px-[clamp(1rem,2vw,2rem)]">
+          <div className="min-h-[50px] py-2 rounded-b-2xl border-t border-white/15 bg-zinc-950/80 flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5">
             <div className="flex items-center gap-2">
               {showEnhanceToggle ? (
                 <button
                   className={cn(
-                    "flex cursor-pointer items-center gap-2 rounded-full border px-[clamp(0.75rem,1.5vw,1.25rem)] text-[clamp(0.75rem,1vw,1.05rem)] font-mono transition-all min-h-[clamp(36px,4.5vh,48px)]",
+                    "flex h-8 cursor-pointer items-center gap-2 rounded-full border px-3 text-xs font-mono transition-all min-h-[34px]",
                     showSearch
                       ? "border-indigo-400/60 bg-indigo-500/20 text-indigo-300 font-semibold"
                       : "border-white/20 bg-white/10 text-slate-300 hover:text-white"
@@ -126,7 +126,7 @@ export default function AI_Input_Search({
                     {showSearch && (
                       <motion.span
                         animate={{ width: "auto", opacity: 1 }}
-                        className="shrink-0 overflow-hidden whitespace-nowrap text-[clamp(0.75rem,1vw,1.05rem)] text-indigo-300 font-semibold"
+                        className="shrink-0 overflow-hidden whitespace-nowrap text-xs text-indigo-300 font-semibold"
                         exit={{ width: 0, opacity: 0 }}
                         initial={{ width: 0, opacity: 0 }}
                         transition={{ duration: 0.2 }}
@@ -142,7 +142,7 @@ export default function AI_Input_Search({
             <div className="flex items-center gap-2 ml-auto">
               <button
                 className={cn(
-                  "flex items-center gap-2 rounded-xl px-[clamp(1rem,2vw,2rem)] py-2.5 min-h-[clamp(42px,5vh,52px)] text-[clamp(0.75rem,1vw,1.05rem)] font-mono font-bold transition-all shadow-lg",
+                  "flex items-center gap-2 rounded-xl px-4 py-2 min-h-[38px] text-xs font-mono font-bold transition-all shadow-lg",
                   value.trim()
                     ? "bg-indigo-600 text-white hover:bg-indigo-500 cursor-pointer"
                     : "bg-white/15 text-slate-400 cursor-not-allowed"
@@ -155,7 +155,7 @@ export default function AI_Input_Search({
                 type="button"
               >
                 <span>Execute Kernel</span>
-                <Send className="h-4 w-4" />
+                <Send className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
