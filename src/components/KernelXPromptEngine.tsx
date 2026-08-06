@@ -175,17 +175,18 @@ export default function KernelXPromptEngine() {
           
           {/* Header */}
           <header className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-primary text-primary-foreground shadow-lg">
-                <Zap className="h-6 w-6" />
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400 drop-shadow-sm">
+                  KernelX Prompt
+                </h1>
+                <Badge variant="outline" className="text-xs font-mono border-primary/50 text-primary bg-primary/10 px-2.5 py-0.5">
+                  v3.4 PRO
+                </Badge>
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-semibold tracking-tight text-white font-mono">KernelX Prompt</h1>
-                  <Badge variant="outline" className="text-[10px] font-mono border-primary/40 text-primary">v3.4 PRO</Badge>
-                </div>
-                <p className="text-xs text-white/60 font-light">Advanced AI Prompt Intelligence & Optimization System</p>
-              </div>
+              <p className="text-xs md:text-sm text-white/70 font-light mt-1">
+                Advanced AI Prompt Intelligence & Optimization System
+              </p>
             </div>
 
             <div className="flex items-center gap-3">
