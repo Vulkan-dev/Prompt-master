@@ -168,12 +168,12 @@ export default function KernelXPromptEngine() {
 
   return (
     <FlowField theme="aurora" density="medium">
-      <div className="min-h-screen relative z-10 px-4 sm:px-6 md:px-10 py-6 sm:py-10 max-w-7xl mx-auto flex flex-col justify-center">
+      <div className="min-h-screen relative z-10 px-3 sm:px-6 md:px-10 py-6 sm:py-10 max-w-7xl mx-auto flex flex-col justify-center">
         
         {/* Main Liquid Glass Shell Container */}
-        <div className="w-full min-h-[82vh] flex flex-col justify-between liquid-glass rounded-3xl p-6 sm:p-10 border border-white/20 shadow-2xl space-y-8 relative overflow-hidden">
+        <div className="w-full h-auto min-h-[600px] flex flex-col justify-between liquid-glass rounded-3xl p-4 sm:p-8 md:p-10 border border-white/20 shadow-2xl space-y-8 relative overflow-hidden">
           
-          <div className="space-y-8">
+          <div className="space-y-8 w-full">
             {/* Header */}
             <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-white/15">
               <div>
@@ -203,26 +203,26 @@ export default function KernelXPromptEngine() {
               </div>
             </header>
 
-            {/* Feature Tabs (3 Focused Modes with High Contrast Triggers) */}
+            {/* Feature Tabs (Adaptive Grid - No Overlap & Zero Text Smash) */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
-              <TabsList className="grid grid-cols-3 gap-2 bg-zinc-900/90 p-1.5 rounded-2xl border border-white/20">
+              <TabsList className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-zinc-900/90 p-2 rounded-2xl border border-white/20 h-auto w-full">
                 <TabsTrigger
                   value="audit"
-                  className="font-mono text-xs sm:text-sm font-bold gap-2 text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl min-h-[44px] transition-all"
+                  className="w-full flex items-center justify-center py-3 px-4 min-h-[44px] font-mono text-xs sm:text-sm font-bold text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl transition-all shadow-md"
                 >
-                  <Zap className="h-4 w-4" /> Audit & Score
+                  <Zap className="h-4 w-4 mr-2 shrink-0" /> Audit & Score
                 </TabsTrigger>
                 <TabsTrigger
                   value="factory"
-                  className="font-mono text-xs sm:text-sm font-bold gap-2 text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl min-h-[44px] transition-all"
+                  className="w-full flex items-center justify-center py-3 px-4 min-h-[44px] font-mono text-xs sm:text-sm font-bold text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl transition-all shadow-md"
                 >
-                  <Sparkles className="h-4 w-4" /> Enhancer
+                  <Sparkles className="h-4 w-4 mr-2 shrink-0" /> Enhancer
                 </TabsTrigger>
                 <TabsTrigger
                   value="vision"
-                  className="font-mono text-xs sm:text-sm font-bold gap-2 text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl min-h-[44px] transition-all"
+                  className="w-full flex items-center justify-center py-3 px-4 min-h-[44px] font-mono text-xs sm:text-sm font-bold text-slate-300 data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-xl transition-all shadow-md"
                 >
-                  <Eye className="h-4 w-4" /> Image to Prompt
+                  <Eye className="h-4 w-4 mr-2 shrink-0" /> Image to Prompt
                 </TabsTrigger>
               </TabsList>
 
@@ -232,6 +232,7 @@ export default function KernelXPromptEngine() {
                   <AI_Input_Search
                     value={prompt}
                     onChange={setPrompt}
+                    showEnhanceToggle={activeTab === 'factory'}
                     onSubmit={() => {
                       if (activeTab === 'audit') handleAnalyze();
                       else if (activeTab === 'factory') handleEnhance();

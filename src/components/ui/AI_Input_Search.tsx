@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 interface AIInputSearchProps {
   placeholder?: string;
   searchLabel?: string;
+  showEnhanceToggle?: boolean;
   onSubmit?: (value: string) => void;
   value?: string;
   onChange?: (val: string) => void;
@@ -17,6 +18,7 @@ interface AIInputSearchProps {
 export default function AI_Input_Search({
   placeholder = "Enter your prompt instruction for KernelX...",
   searchLabel = "Enhance Mode",
+  showEnhanceToggle = true,
   onSubmit,
   value: externalValue,
   onChange: externalOnChange,
@@ -86,53 +88,55 @@ export default function AI_Input_Search({
 
           <div className="min-h-[56px] py-2.5 rounded-b-2xl border-t border-white/15 bg-zinc-950/80 flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-2">
-              <button
-                className={cn(
-                  "flex h-9 cursor-pointer items-center gap-2 rounded-full border px-3.5 text-xs font-mono transition-all min-h-[38px]",
-                  showSearch
-                    ? "border-indigo-400/60 bg-indigo-500/20 text-indigo-300 font-semibold"
-                    : "border-white/20 bg-white/10 text-slate-300 hover:text-white"
-                )}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowSearch(!showSearch);
-                }}
-                type="button"
-              >
-                <div className="flex h-4 w-4 shrink-0 items-center justify-center">
-                  <motion.div
-                    animate={{
-                      rotate: showSearch ? 180 : 0,
-                      scale: showSearch ? 1.1 : 1,
-                    }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 260,
-                      damping: 25,
-                    }}
-                  >
-                    <Globe
-                      className={cn(
-                        "h-3.5 w-3.5",
-                        showSearch ? "text-indigo-300" : "text-inherit"
-                      )}
-                    />
-                  </motion.div>
-                </div>
-                <AnimatePresence>
-                  {showSearch && (
-                    <motion.span
-                      animate={{ width: "auto", opacity: 1 }}
-                      className="shrink-0 overflow-hidden whitespace-nowrap text-xs text-indigo-300 font-semibold"
-                      exit={{ width: 0, opacity: 0 }}
-                      initial={{ width: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {searchLabel}
-                    </motion.span>
+              {showEnhanceToggle ? (
+                <button
+                  className={cn(
+                    "flex h-9 cursor-pointer items-center gap-2 rounded-full border px-3.5 text-xs font-mono transition-all min-h-[38px]",
+                    showSearch
+                      ? "border-indigo-400/60 bg-indigo-500/20 text-indigo-300 font-semibold"
+                      : "border-white/20 bg-white/10 text-slate-300 hover:text-white"
                   )}
-                </AnimatePresence>
-              </button>
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSearch(!showSearch);
+                  }}
+                  type="button"
+                >
+                  <div className="flex h-4 w-4 shrink-0 items-center justify-center">
+                    <motion.div
+                      animate={{
+                        rotate: showSearch ? 180 : 0,
+                        scale: showSearch ? 1.1 : 1,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 25,
+                      }}
+                    >
+                      <Globe
+                        className={cn(
+                          "h-3.5 w-3.5",
+                          showSearch ? "text-indigo-300" : "text-inherit"
+                        )}
+                      />
+                    </motion.div>
+                  </div>
+                  <AnimatePresence>
+                    {showSearch && (
+                      <motion.span
+                        animate={{ width: "auto", opacity: 1 }}
+                        className="shrink-0 overflow-hidden whitespace-nowrap text-xs text-indigo-300 font-semibold"
+                        exit={{ width: 0, opacity: 0 }}
+                        initial={{ width: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {searchLabel}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </button>
+              ) : null}
             </div>
 
             <div className="flex items-center gap-2 ml-auto">
