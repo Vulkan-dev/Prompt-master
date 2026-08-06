@@ -57,7 +57,7 @@ export default function SmoothTab({
     <div
       aria-label="KernelX Navigation Tabs"
       className={cn(
-        "relative flex items-center justify-between gap-1 p-1.5 w-full bg-zinc-900/90 rounded-2xl border border-white/20 shadow-xl overflow-hidden",
+        "relative flex items-center justify-between gap-1 p-1.5 w-full bg-zinc-950/40 backdrop-blur-2xl rounded-2xl border border-white/20 shadow-xl overflow-hidden",
         className
       )}
       ref={containerRef}

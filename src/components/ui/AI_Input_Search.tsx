@@ -60,7 +60,7 @@ export default function AI_Input_Search({
         <div
           aria-label="Search input container"
           className={cn(
-            "relative flex w-full cursor-text flex-col rounded-2xl text-left transition-all duration-200 bg-zinc-900/90 border border-white/20 shadow-xl",
+            "relative flex w-full cursor-text flex-col rounded-2xl text-left transition-all duration-200 bg-zinc-950/40 backdrop-blur-2xl border border-white/20 shadow-xl",
             isFocused && "ring-2 ring-indigo-500 border-indigo-400 rich-glow"
           )}
           onClick={handleContainerClick}

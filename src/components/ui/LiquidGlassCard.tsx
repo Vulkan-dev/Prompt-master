@@ -2,10 +2,10 @@ import React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const GLASS_SHADOW = "shadow-[0_0_12px_rgba(0,0,0,0.4),inset_1px_1px_1px_rgba(255,255,255,0.15)]";
+const GLASS_SHADOW = "shadow-[0_0_15px_rgba(0,0,0,0.5),inset_1px_1px_1px_rgba(255,255,255,0.2)]";
 
 const liquidGlassCardVariants = cva(
-  "group relative overflow-hidden bg-card/60 backdrop-blur-xl border border-white/15 rounded-2xl transition-all duration-300 w-full max-w-full",
+  "group relative overflow-hidden bg-zinc-950/35 backdrop-blur-2xl border border-white/15 rounded-2xl transition-all duration-300 w-full max-w-full",
   {
     variants: {
       glassSize: {
@@ -63,7 +63,7 @@ export function LiquidButton({
       onClick={onClick}
       className={cn(
         "relative inline-flex items-center justify-center gap-2 min-h-[40px] px-5 py-2 rounded-xl font-mono text-xs font-bold tracking-wide transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg cursor-pointer",
-        "bg-indigo-600 text-white hover:bg-indigo-500",
+        "bg-indigo-600/90 hover:bg-indigo-500 text-white backdrop-blur-md",
         className
       )}
       {...props}
