@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Sparkles, ShieldCheck, CheckCircle2, Copy, RefreshCw, Zap, Eye, Split, Download, History, AlertTriangle, Trash2, X } from 'lucide-react';
+import { Sparkles, ShieldCheck, CheckCircle2, Copy, RefreshCw, Zap, Eye, Split, Download, History, AlertTriangle, Trash2, X, RotateCcw } from 'lucide-react';
 
 import FlowField from './ui/FlowField';
 import AI_Input_Search from './ui/AI_Input_Search';
@@ -74,6 +74,7 @@ export default function KernelXPromptEngine() {
   // Vision / File states
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageMeta, setImageMeta] = useState<{ name: string; size: string } | null>(null);
+  const imageInputRef = React.useRef<HTMLInputElement>(null);
 
   // Modals & History
   const [isDiffModalOpen, setIsDiffModalOpen] = useState(false);
@@ -460,16 +461,62 @@ export default function KernelXPromptEngine() {
                     transition={tabTransition}
                     className="space-y-6 pt-2 w-full"
                   >
-                    <FileUpload onUploadSuccess={handleFileUpload} />
+                    {!imagePreview ? (
+                      <FileUpload onUploadSuccess={handleFileUpload} />
+                    ) : (
+                      <div className="relative rounded-2xl overflow-hidden border border-white/20 glass-card p-3 sm:p-5 bg-zinc-950/80 shadow-2xl">
+                        <input
+                          ref={imageInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              handleFileUpload(e.target.files[0]);
+                            }
+                          }}
+                        />
+                        
+                        <div className="relative w-full max-h-[460px] min-h-[260px] flex items-center justify-center overflow-hidden rounded-xl bg-black/80">
+                          <img
+                            src={imagePreview}
+                            alt="Uploaded Preview"
+                            className="max-h-[440px] w-auto max-w-full object-contain rounded-xl"
+                          />
+                          
+                          {/* Floating Actions overlay (matching user reference screenshot) */}
+                          <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/40 backdrop-blur-[2px] opacity-95 transition-opacity">
+                            <button
+                              type="button"
+                              onClick={() => imageInputRef.current?.click()}
+                              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-white/20 text-white font-mono text-xs sm:text-sm font-bold shadow-xl transition-all active:scale-95 cursor-pointer"
+                            >
+                              <RotateCcw className="h-4 w-4 text-indigo-300" />
+                              <span>Change Image</span>
+                            </button>
 
-                    {imagePreview && (
-                      <LiquidGlassCard className="p-4 flex items-center gap-4">
-                        <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-xl border border-white/20" />
-                        <div className="font-mono text-xs space-y-1">
-                          <p className="font-bold text-white">{imageMeta?.name}</p>
-                          <p className="text-slate-300">{imageMeta?.size}</p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setImagePreview(null);
+                                setImageMeta(null);
+                                setVisionResult(null);
+                              }}
+                              className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full bg-red-950/90 hover:bg-red-900 border border-red-500/40 text-red-300 font-mono text-xs sm:text-sm font-bold shadow-xl transition-all active:scale-95 cursor-pointer"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-400" />
+                              <span>Remove</span>
+                            </button>
+                          </div>
                         </div>
-                      </LiquidGlassCard>
+
+                        {imageMeta && (
+                          <div className="flex items-center justify-between mt-3 px-2 font-mono text-xs text-slate-300">
+                            <span className="truncate font-semibold text-white max-w-[70%]">{imageMeta.name}</span>
+                            <span className="text-indigo-300">{imageMeta.size}</span>
+                          </div>
+                        )}
+                      </div>
                     )}
 
                     {visionResult && (
