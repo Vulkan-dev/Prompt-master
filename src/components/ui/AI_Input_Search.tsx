@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { Globe, Paperclip, Send, Sparkles } from "lucide-react";
+import React, { useState } from "react";
+import { Globe, Send } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Textarea } from "../../../components/ui/textarea";
 import { useAutoResizeTextarea } from "../../hooks/use-auto-resize-textarea";
@@ -9,7 +9,6 @@ interface AIInputSearchProps {
   placeholder?: string;
   searchLabel?: string;
   onSubmit?: (value: string) => void;
-  onFileSelect?: (file: File) => void;
   value?: string;
   onChange?: (val: string) => void;
   className?: string;
@@ -19,7 +18,6 @@ export default function AI_Input_Search({
   placeholder = "Enter your prompt instruction for KernelX...",
   searchLabel = "Enhance Mode",
   onSubmit,
-  onFileSelect,
   value: externalValue,
   onChange: externalOnChange,
   className,
@@ -29,11 +27,10 @@ export default function AI_Input_Search({
 
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 80,
-    maxHeight: 280,
+    maxHeight: 260,
   });
   const [showSearch, setShowSearch] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleTextChange = (val: string) => {
     if (externalOnChange) {
@@ -55,12 +52,6 @@ export default function AI_Input_Search({
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      onFileSelect?.(e.target.files[0]);
-    }
-  };
-
   return (
     <div className={cn("w-full", className)}>
       <div className="relative mx-auto w-full">
@@ -74,7 +65,7 @@ export default function AI_Input_Search({
           role="textbox"
           tabIndex={0}
         >
-          <div className="max-h-[280px] overflow-y-auto">
+          <div className="max-h-[260px] overflow-y-auto">
             <Textarea
               className="w-full resize-none rounded-2xl rounded-b-none border-none bg-transparent px-5 py-4 leading-relaxed text-foreground placeholder:text-foreground/40 font-mono text-sm focus-visible:ring-0"
               id="kernelx-ai-input"
@@ -95,16 +86,6 @@ export default function AI_Input_Search({
 
           <div className="h-14 rounded-b-2xl border-t border-foreground/10 bg-foreground/[0.02] flex items-center justify-between px-4">
             <div className="flex items-center gap-3">
-              <label className="cursor-pointer rounded-lg bg-foreground/5 p-2 hover:bg-foreground/10 transition-all text-foreground/70 hover:text-foreground">
-                <input
-                  ref={fileInputRef}
-                  className="hidden"
-                  type="file"
-                  onChange={handleFileChange}
-                />
-                <Paperclip className="h-4 w-4" />
-              </label>
-
               <button
                 className={cn(
                   "flex h-8 cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-xs font-mono transition-all",

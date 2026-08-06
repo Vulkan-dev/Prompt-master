@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { analyzePrompt, optimizePrompt, imageToPrompt, enhancePrompt, AnalysisResult, OptimizationResult, ImageToPromptResult, EnhancementResult } from '../lib/gemini';
 import { scanPromptSecurity } from '../lib/heuristics';
@@ -8,46 +8,13 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Sparkles, ShieldAlert, CheckCircle2, Copy, RefreshCw, Sun, Moon, Zap, BookOpen, UserCircle, GitBranch, ListChecks, MessageSquare, ShieldCheck, AlertTriangle, FileText, Trash2, Image as ImageIcon, Eye, Split, Download, History, Terminal, Code2, Layers } from 'lucide-react';
+import { Sparkles, ShieldCheck, CheckCircle2, Copy, RefreshCw, Zap, Eye, Split, Download, History, AlertTriangle } from 'lucide-react';
 
 import FlowField from './ui/FlowField';
 import AI_Input_Search from './ui/AI_Input_Search';
 import AITextLoading from './ui/AITextLoading';
 import FileUpload from './ui/FileUpload';
 import { LiquidGlassCard, LiquidButton } from './ui/LiquidGlassCard';
-
-const PROMPT_RECIPES = [
-  {
-    id: 'persona',
-    name: 'Persona Pattern',
-    icon: <UserCircle className="h-5 w-5" />,
-    description: 'Assign a specialized expert role to the AI to guide perspective.',
-    template: (input: string) => `Act as an expert [Role]. Your task is to: ${input}\n\nPlease provide a professional and detailed response.`
-  },
-  {
-    id: 'cot',
-    name: 'Chain of Thought',
-    icon: <GitBranch className="h-5 w-5" />,
-    description: 'Encourage systematic, logical step-by-step reasoning breakdown.',
-    template: (input: string) => `Please solve the following task by thinking step-by-step. \n\nTask: ${input}\n\nLet's think through this logically:`
-  },
-  {
-    id: 'fewshot',
-    name: 'Few-Shot Examples',
-    icon: <MessageSquare className="h-5 w-5" />,
-    description: 'Provide demonstration input/output pairs for precision.',
-    template: (input: string) => `Here are a few examples of how to perform this task:\nExample 1: [Input] -> [Output]\nExample 2: [Input] -> [Output]\n\nNow, perform the task for this input: ${input}`
-  },
-  {
-    id: 'stepbystep',
-    name: 'Step-by-Step Execution',
-    icon: <ListChecks className="h-5 w-5" />,
-    description: 'Format response into a clear, numbered sequence.',
-    template: (input: string) => `Break down the following task into a clear, numbered sequence of steps: ${input}`
-  }
-];
-
-type Theme = 'dark' | 'light' | 'classic';
 
 interface HistoryItem {
   id: string;
@@ -59,14 +26,6 @@ interface HistoryItem {
 }
 
 export default function KernelXPromptEngine() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('kernelx_theme') as Theme;
-      if (saved) return saved;
-    }
-    return 'dark';
-  });
-
   const [prompt, setPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -89,10 +48,8 @@ export default function KernelXPromptEngine() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.remove('dark', 'light', 'classic');
-    document.documentElement.classList.add(theme);
-    localStorage.setItem('kernelx_theme', theme);
-  }, [theme]);
+    document.documentElement.classList.add('dark');
+  }, []);
 
   useEffect(() => {
     try {
@@ -206,371 +163,287 @@ export default function KernelXPromptEngine() {
         }
       };
       reader.readAsDataURL(file);
-    } else {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPrompt(reader.result as string);
-      };
-      reader.readAsText(file);
     }
   };
 
   return (
-    <FlowField theme={theme === 'light' ? 'ocean' : 'aurora'} density="medium">
-      <div className="min-h-screen relative z-10 px-4 md:px-8 py-8 max-w-6xl mx-auto space-y-10">
+    <FlowField theme="aurora" density="medium">
+      <div className="min-h-screen relative z-10 px-4 md:px-8 py-10 max-w-6xl mx-auto">
         
-        {/* Navigation & Header */}
-        <header className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-foreground/10">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-primary text-primary-foreground shadow-lg">
-              <Zap className="h-6 w-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight text-foreground font-mono">KernelX Prompt</h1>
-                <Badge variant="outline" className="text-[10px] font-mono border-primary/40 text-primary">v3.4 PRO</Badge>
+        {/* Main Liquid Glass Shell Container */}
+        <div className="liquid-glass rounded-3xl p-6 md:p-10 space-y-8 relative overflow-hidden">
+          
+          {/* Header */}
+          <header className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-primary text-primary-foreground shadow-lg">
+                <Zap className="h-6 w-6" />
               </div>
-              <p className="text-xs text-foreground/60 font-light">Advanced AI Prompt Engineering & Intelligence System</p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-semibold tracking-tight text-white font-mono">KernelX Prompt</h1>
+                  <Badge variant="outline" className="text-[10px] font-mono border-primary/40 text-primary">v3.4 PRO</Badge>
+                </div>
+                <p className="text-xs text-white/60 font-light">Advanced AI Prompt Intelligence & Optimization System</p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-              className="font-mono text-xs gap-2 border-foreground/15 hover:bg-foreground/5"
-            >
-              <History className="h-4 w-4" />
-              Logs ({history.length})
-            </Button>
-
-            {/* Theme Toggle */}
-            <div className="flex items-center p-1 rounded-xl bg-foreground/5 border border-foreground/10">
-              <button
-                onClick={() => setTheme('dark')}
-                className={`p-2 rounded-lg text-xs font-mono transition-all ${theme === 'dark' ? 'bg-primary text-primary-foreground shadow' : 'text-foreground/60 hover:text-foreground'}`}
-                title="Dark Mode"
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                className="font-mono text-xs gap-2 border-white/15 bg-white/5 hover:bg-white/10 text-white"
               >
-                <Moon className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={() => setTheme('light')}
-                className={`p-2 rounded-lg text-xs font-mono transition-all ${theme === 'light' ? 'bg-primary text-primary-foreground shadow' : 'text-foreground/60 hover:text-foreground'}`}
-                title="Light Mode"
-              >
-                <Sun className="h-3.5 w-3.5" />
-              </button>
+                <History className="h-4 w-4" />
+                Logs ({history.length})
+              </Button>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Feature Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
-          <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2 bg-foreground/5 p-1.5 rounded-2xl border border-foreground/10">
-            <TabsTrigger value="audit" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
-              <Zap className="h-3.5 w-3.5" /> Audit & Score
-            </TabsTrigger>
-            <TabsTrigger value="factory" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
-              <Sparkles className="h-3.5 w-3.5" /> Prompt Factory
-            </TabsTrigger>
-            <TabsTrigger value="vision" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
-              <Eye className="h-3.5 w-3.5" /> Vision Engine
-            </TabsTrigger>
-            <TabsTrigger value="recipes" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
-              <BookOpen className="h-3.5 w-3.5" /> Recipes Matrix
-            </TabsTrigger>
-            <TabsTrigger value="security" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
-              <ShieldAlert className="h-3.5 w-3.5" /> Security Scan
-            </TabsTrigger>
-          </TabsList>
+          {/* Feature Tabs (3 Focused Modes) */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
+            <TabsList className="grid grid-cols-3 gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10">
+              <TabsTrigger value="audit" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
+                <Zap className="h-3.5 w-3.5" /> Audit & Score
+              </TabsTrigger>
+              <TabsTrigger value="factory" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
+                <Sparkles className="h-3.5 w-3.5" /> Enhancer
+              </TabsTrigger>
+              <TabsTrigger value="vision" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
+                <Eye className="h-3.5 w-3.5" /> Image to Prompt
+              </TabsTrigger>
+            </TabsList>
 
-          {/* AI Search & Input Area */}
-          <div className="space-y-4">
-            <AI_Input_Search
-              value={prompt}
-              onChange={setPrompt}
-              onSubmit={() => {
-                if (activeTab === 'audit') handleAnalyze();
-                else if (activeTab === 'factory') handleEnhance();
-                else if (activeTab === 'security') {
-                  setSecurityScan(scanPromptSecurity(prompt));
-                }
-              }}
-              onFileSelect={handleFileUpload}
-              placeholder="Enter or edit your prompt instruction here..."
-            />
+            {/* Input Search Console (For Audit & Enhancer) */}
+            {activeTab !== 'vision' && (
+              <div className="space-y-4">
+                <AI_Input_Search
+                  value={prompt}
+                  onChange={setPrompt}
+                  onSubmit={() => {
+                    if (activeTab === 'audit') handleAnalyze();
+                    else if (activeTab === 'factory') handleEnhance();
+                  }}
+                  placeholder="Enter your prompt instruction here..."
+                />
 
-            {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs font-mono text-foreground/50">
-                <span>{prompt.length} characters</span>
-                <span>•</span>
-                <span>{prompt.split(/\s+/).filter(Boolean).length} words</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {activeTab === 'audit' && (
-                  <>
-                    <LiquidButton onClick={handleAnalyze} disabled={isProcessing || !prompt.trim()}>
-                      {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-                      Audit Score
-                    </LiquidButton>
-                    <Button variant="outline" onClick={handleOptimize} disabled={isProcessing || !prompt.trim()} className="font-mono text-xs border-foreground/20">
-                      <Sparkles className="h-4 w-4 mr-2 text-primary" />
-                      Auto-Optimize
-                    </Button>
-                  </>
-                )}
-
-                {activeTab === 'factory' && (
-                  <LiquidButton onClick={handleEnhance} disabled={isProcessing || !prompt.trim()}>
-                    <Sparkles className="h-4 w-4" />
-                    Generate Production Prompt
-                  </LiquidButton>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Loading Animation Overlay */}
-          {isProcessing && (
-            <AITextLoading
-              texts={[
-                "KernelX Analyzing Instruction...",
-                "Evaluating Criteria Metrics...",
-                "Checking Security Vulnerabilities...",
-                "Optimizing Neural Execution...",
-                "Formatting Final Prompt..."
-              ]}
-            />
-          )}
-
-          {/* TAB 1: AUDIT & OPTIMIZE */}
-          <TabsContent value="audit" className="space-y-6 pt-4">
-            {analysisResult && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Score Dial Card */}
-                <LiquidGlassCard className="lg:col-span-4 flex flex-col items-center justify-center p-8 text-center space-y-4">
-                  <span className="text-xs font-mono uppercase tracking-widest text-foreground/60">Overall Quality Score</span>
-                  <div className="relative flex items-center justify-center w-36 h-36 rounded-full border-4 border-primary/30 bg-primary/5">
-                    <span className={`font-mono text-5xl font-extrabold ${analysisResult.overallScore >= 80 ? 'text-emerald-500' : analysisResult.overallScore >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
-                      {analysisResult.overallScore}
-                    </span>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-xs font-mono text-white/50">
+                    <span>{prompt.length} characters</span>
+                    <span>•</span>
+                    <span>{prompt.split(/\s+/).filter(Boolean).length} words</span>
                   </div>
-                  <span className="text-xs font-mono text-foreground/50">Evaluated on 5 dimensions</span>
-                </LiquidGlassCard>
 
-                {/* Diagnostic Breakdown Card */}
-                <LiquidGlassCard className="lg:col-span-8 p-6 space-y-4">
-                  <h3 className="font-mono text-sm font-semibold tracking-wider text-foreground uppercase border-b border-foreground/10 pb-3">
-                    Diagnostic Criteria Radar
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    {activeTab === 'audit' && (
+                      <>
+                        <LiquidButton onClick={handleAnalyze} disabled={isProcessing || !prompt.trim()}>
+                          {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                          Audit Score
+                        </LiquidButton>
+                        <Button variant="outline" onClick={handleOptimize} disabled={isProcessing || !prompt.trim()} className="font-mono text-xs border-white/20 text-white hover:bg-white/10">
+                          <Sparkles className="h-4 w-4 mr-2 text-primary" />
+                          Auto-Optimize
+                        </Button>
+                      </>
+                    )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {Object.entries(analysisResult.criteria).map(([key, val]) => (
-                      <div key={key} className="p-3.5 rounded-xl bg-foreground/5 border border-foreground/10 space-y-2">
-                        <div className="flex justify-between font-mono text-xs">
-                          <span className="capitalize font-medium text-foreground">{key}</span>
-                          <span className="text-primary font-bold">{Number(val)}/10</span>
-                        </div>
-                        <Progress value={(Number(val) / 10) * 100} className="h-2" />
-                      </div>
-                    ))}
+                    {activeTab === 'factory' && (
+                      <LiquidButton onClick={handleEnhance} disabled={isProcessing || !prompt.trim()}>
+                        <Sparkles className="h-4 w-4" />
+                        Generate Enhanced Prompt
+                      </LiquidButton>
+                    )}
                   </div>
-                </LiquidGlassCard>
+                </div>
+              </div>
+            )}
 
-                {/* Optimized Output Card */}
-                {optimizedResult && (
-                  <LiquidGlassCard className="lg:col-span-12 p-6 space-y-4">
-                    <div className="flex items-center justify-between border-b border-foreground/10 pb-4">
-                      <div className="flex items-center gap-2 text-primary">
-                        <Sparkles className="h-5 w-5" />
-                        <h3 className="font-mono text-base font-semibold">KernelX Neural Optimized Prompt</h3>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={() => setIsDiffModalOpen(true)} className="font-mono text-xs border-foreground/20">
-                          <Split className="h-4 w-4 mr-1" /> Compare Diff
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleCopy(optimizedResult.optimizedPrompt)} className="font-mono text-xs border-foreground/20">
-                          <Copy className="h-4 w-4 mr-1" /> Copy
-                        </Button>
-                      </div>
-                    </div>
+            {/* Loading Animation Overlay */}
+            {isProcessing && (
+              <AITextLoading
+                texts={[
+                  "KernelX Analyzing Instruction...",
+                  "Evaluating Criteria Metrics...",
+                  "Checking Security Vulnerabilities...",
+                  "Optimizing Neural Execution...",
+                  "Formatting Final Prompt..."
+                ]}
+              />
+            )}
 
-                    <div className="p-5 rounded-xl bg-foreground/5 border border-foreground/10 font-mono text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                      {optimizedResult.optimizedPrompt}
+            {/* TAB 1: AUDIT & SCORE */}
+            <TabsContent value="audit" className="space-y-6 pt-2">
+              {analysisResult && (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Score Card */}
+                  <LiquidGlassCard className="lg:col-span-4 flex flex-col items-center justify-center p-8 text-center space-y-4">
+                    <span className="text-xs font-mono uppercase tracking-widest text-white/60">Overall Quality Score</span>
+                    <div className="relative flex items-center justify-center w-36 h-36 rounded-full border-4 border-primary/40 bg-primary/10 shadow-lg">
+                      <span className={`font-mono text-5xl font-extrabold ${analysisResult.overallScore >= 80 ? 'text-emerald-400' : analysisResult.overallScore >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                        {analysisResult.overallScore}
+                      </span>
                     </div>
+                    <span className="text-xs font-mono text-white/50">Evaluated on 5 dimensions</span>
                   </LiquidGlassCard>
-                )}
-              </div>
-            )}
-          </TabsContent>
 
-          {/* TAB 2: PROMPT FACTORY */}
-          <TabsContent value="factory" className="space-y-6 pt-4">
-            {enhancementResult ? (
-              <LiquidGlassCard className="p-6 space-y-4">
-                <div className="flex items-center justify-between border-b border-foreground/10 pb-4">
-                  <span className="font-mono text-sm font-semibold text-foreground">Production-Grade Prompt</span>
-                  <Badge variant="outline" className="font-mono text-xs border-primary/40 text-primary uppercase">
-                    {enhancementResult.category}
-                  </Badge>
-                </div>
+                  {/* Diagnostic Breakdown Card */}
+                  <LiquidGlassCard className="lg:col-span-8 p-6 space-y-4">
+                    <h3 className="font-mono text-sm font-semibold tracking-wider text-white uppercase border-b border-white/10 pb-3">
+                      Diagnostic Criteria Radar
+                    </h3>
 
-                <div className="p-5 rounded-xl bg-foreground/5 border border-foreground/10 font-mono text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                  {enhancementResult.enhancedPrompt}
-                </div>
-
-                <div className="space-y-2 pt-2">
-                  <span className="text-xs font-mono text-foreground/60">Applied Engineering Enhancements:</span>
-                  <ul className="space-y-2 font-mono text-xs text-foreground/80">
-                    {enhancementResult.improvements.map((imp, idx) => (
-                      <li key={idx} className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                        <span>{imp}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </LiquidGlassCard>
-            ) : (
-              <FileUpload onUploadSuccess={handleFileUpload} />
-            )}
-          </TabsContent>
-
-          {/* TAB 3: VISION ENGINE */}
-          <TabsContent value="vision" className="space-y-6 pt-4">
-            <FileUpload onUploadSuccess={handleFileUpload} />
-
-            {imagePreview && (
-              <LiquidGlassCard className="p-4 flex items-center gap-4">
-                <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-xl border border-foreground/15" />
-                <div className="font-mono text-xs space-y-1">
-                  <p className="font-semibold text-foreground">{imageMeta?.name}</p>
-                  <p className="text-foreground/50">{imageMeta?.size}</p>
-                </div>
-              </LiquidGlassCard>
-            )}
-
-            {visionResult && (
-              <LiquidGlassCard className="p-6 space-y-4">
-                <div className="flex items-center justify-between border-b border-foreground/10 pb-3">
-                  <h3 className="font-mono text-sm font-semibold text-foreground">Extracted Image Generation Prompt</h3>
-                  <Button variant="outline" size="sm" onClick={() => handleCopy(visionResult.generatedPrompt)} className="font-mono text-xs border-foreground/20">
-                    <Copy className="h-4 w-4 mr-1" /> Copy
-                  </Button>
-                </div>
-
-                <div className="p-4 rounded-xl bg-foreground/5 border border-foreground/10 font-mono text-sm text-foreground leading-relaxed">
-                  {visionResult.generatedPrompt}
-                </div>
-              </LiquidGlassCard>
-            )}
-          </TabsContent>
-
-          {/* TAB 4: RECIPES MATRIX */}
-          <TabsContent value="recipes" className="space-y-6 pt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {PROMPT_RECIPES.map((recipe) => (
-                <LiquidGlassCard key={recipe.id} className="p-6 space-y-3 hover:scale-[1.01] transition-transform">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
-                        {recipe.icon}
-                      </div>
-                      <span className="font-mono font-semibold text-sm text-foreground">{recipe.name}</span>
-                    </div>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setPrompt(recipe.template(prompt || '[Your Target Instruction]'));
-                      }}
-                      className="font-mono text-xs"
-                    >
-                      Apply
-                    </Button>
-                  </div>
-                  <p className="text-xs text-foreground/60 font-light leading-relaxed">
-                    {recipe.description}
-                  </p>
-                </LiquidGlassCard>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* TAB 5: SECURITY SCANNER */}
-          <TabsContent value="security" className="space-y-6 pt-4">
-            {securityScan && (
-              <LiquidGlassCard className="p-6 space-y-4">
-                <div className="flex items-center justify-between border-b border-foreground/10 pb-4">
-                  <h3 className="font-mono text-sm font-semibold text-foreground">Vulnerability Matrix Score</h3>
-                  <span className={`font-mono text-xl font-bold ${securityScan.isSecure ? 'text-emerald-500' : 'text-red-500'}`}>
-                    {securityScan.securityScore} / 100
-                  </span>
-                </div>
-
-                {securityScan.isSecure ? (
-                  <Alert className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
-                    <ShieldCheck className="h-5 w-5" />
-                    <AlertTitle className="font-mono text-sm font-semibold">Clean Security Scan</AlertTitle>
-                    <AlertDescription className="font-mono text-xs">
-                      No instruction overrides, jailbreaks, or sensitive data leakage threats detected.
-                    </AlertDescription>
-                  </Alert>
-                ) : (
-                  <div className="space-y-2">
-                    <span className="text-xs font-mono text-red-500 font-semibold">Security Warnings:</span>
-                    <div className="space-y-2 font-mono text-xs">
-                      {securityScan.warnings.map((warn, i) => (
-                        <Alert key={i} variant="destructive" className="bg-destructive/10 border-destructive/30">
-                          <AlertTriangle className="h-4 w-4" />
-                          <AlertDescription>{warn}</AlertDescription>
-                        </Alert>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {Object.entries(analysisResult.criteria).map(([key, val]) => (
+                        <div key={key} className="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-2">
+                          <div className="flex justify-between font-mono text-xs">
+                            <span className="capitalize font-medium text-white">{key}</span>
+                            <span className="text-primary font-bold">{Number(val)}/10</span>
+                          </div>
+                          <Progress value={(Number(val) / 10) * 100} className="h-2" />
+                        </div>
                       ))}
                     </div>
+                  </LiquidGlassCard>
+
+                  {/* Security Alert if threats detected */}
+                  {securityScan && !securityScan.isSecure && (
+                    <div className="lg:col-span-12">
+                      <Alert variant="destructive" className="bg-destructive/20 border-destructive/40 text-white">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle className="font-mono text-xs font-bold">Security Alert Detected</AlertTitle>
+                        <AlertDescription className="font-mono text-xs">
+                          {securityScan.warnings.join(' • ')}
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  )}
+
+                  {/* Optimized Output Card */}
+                  {optimizedResult && (
+                    <LiquidGlassCard className="lg:col-span-12 p-6 space-y-4">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                        <div className="flex items-center gap-2 text-primary">
+                          <Sparkles className="h-5 w-5" />
+                          <h3 className="font-mono text-base font-semibold">KernelX Optimized Output</h3>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm" onClick={() => setIsDiffModalOpen(true)} className="font-mono text-xs border-white/20 text-white hover:bg-white/10">
+                            <Split className="h-4 w-4 mr-1" /> Compare Diff
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => handleCopy(optimizedResult.optimizedPrompt)} className="font-mono text-xs border-white/20 text-white hover:bg-white/10">
+                            <Copy className="h-4 w-4 mr-1" /> Copy
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="p-5 rounded-xl bg-black/50 border border-white/10 font-mono text-sm text-white leading-relaxed whitespace-pre-wrap">
+                        {optimizedResult.optimizedPrompt}
+                      </div>
+                    </LiquidGlassCard>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* TAB 2: ENHANCER */}
+            <TabsContent value="factory" className="space-y-6 pt-2">
+              {enhancementResult && (
+                <LiquidGlassCard className="p-6 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                    <span className="font-mono text-sm font-semibold text-white">Production-Grade Enhanced Prompt</span>
+                    <Badge variant="outline" className="font-mono text-xs border-primary/40 text-primary uppercase">
+                      {enhancementResult.category}
+                    </Badge>
                   </div>
-                )}
-              </LiquidGlassCard>
-            )}
-          </TabsContent>
-        </Tabs>
 
-        {/* Side-by-Side Diff Modal */}
-        <Dialog open={isDiffModalOpen} onOpenChange={setIsDiffModalOpen}>
-          <DialogContent className="max-w-4xl glass-card border border-foreground/20 p-6 space-y-4">
-            <DialogHeader>
-              <DialogTitle className="font-mono text-base font-bold flex items-center gap-2">
-                <Split className="h-5 w-5 text-primary" /> Prompt Diff Inspection
-              </DialogTitle>
-              <DialogDescription className="font-mono text-xs text-foreground/60">
-                Side-by-side comparison of original input vs KernelX optimized version.
-              </DialogDescription>
-            </DialogHeader>
+                  <div className="p-5 rounded-xl bg-black/50 border border-white/10 font-mono text-sm text-white leading-relaxed whitespace-pre-wrap">
+                    {enhancementResult.enhancedPrompt}
+                  </div>
 
-            {optimizedResult && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
-                <div className="space-y-2">
-                  <span className="font-semibold text-foreground/70">Original Input:</span>
-                  <div className="p-4 rounded-xl bg-foreground/5 border border-foreground/10 h-64 overflow-y-auto leading-relaxed whitespace-pre-wrap">
-                    {prompt}
+                  <div className="space-y-2 pt-2">
+                    <span className="text-xs font-mono text-white/60">Applied Enhancements:</span>
+                    <ul className="space-y-2 font-mono text-xs text-white/90">
+                      {enhancementResult.improvements.map((imp, idx) => (
+                        <li key={idx} className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                          <span>{imp}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </LiquidGlassCard>
+              )}
+            </TabsContent>
+
+            {/* TAB 3: IMAGE TO PROMPT */}
+            <TabsContent value="vision" className="space-y-6 pt-2">
+              <FileUpload onUploadSuccess={handleFileUpload} />
+
+              {imagePreview && (
+                <LiquidGlassCard className="p-4 flex items-center gap-4">
+                  <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-xl border border-white/20" />
+                  <div className="font-mono text-xs space-y-1">
+                    <p className="font-semibold text-white">{imageMeta?.name}</p>
+                    <p className="text-white/50">{imageMeta?.size}</p>
+                  </div>
+                </LiquidGlassCard>
+              )}
+
+              {visionResult && (
+                <LiquidGlassCard className="p-6 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <h3 className="font-mono text-sm font-semibold text-white">Extracted Image Generation Prompt</h3>
+                    <Button variant="outline" size="sm" onClick={() => handleCopy(visionResult.generatedPrompt)} className="font-mono text-xs border-white/20 text-white hover:bg-white/10">
+                      <Copy className="h-4 w-4 mr-1" /> Copy
+                    </Button>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-black/50 border border-white/10 font-mono text-sm text-white leading-relaxed">
+                    {visionResult.generatedPrompt}
+                  </div>
+                </LiquidGlassCard>
+              )}
+            </TabsContent>
+          </Tabs>
+
+          {/* Side-by-Side Diff Modal */}
+          <Dialog open={isDiffModalOpen} onOpenChange={setIsDiffModalOpen}>
+            <DialogContent className="max-w-4xl glass-card border border-white/20 p-6 space-y-4">
+              <DialogHeader>
+                <DialogTitle className="font-mono text-base font-bold flex items-center gap-2 text-white">
+                  <Split className="h-5 w-5 text-primary" /> Prompt Diff Inspection
+                </DialogTitle>
+                <DialogDescription className="font-mono text-xs text-white/60">
+                  Side-by-side comparison of original input vs KernelX optimized version.
+                </DialogDescription>
+              </DialogHeader>
+
+              {optimizedResult && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                  <div className="space-y-2">
+                    <span className="font-semibold text-white/70">Original Input:</span>
+                    <div className="p-4 rounded-xl bg-black/50 border border-white/10 h-64 overflow-y-auto leading-relaxed whitespace-pre-wrap text-white">
+                      {prompt}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <span className="font-semibold text-primary">KernelX Optimized:</span>
+                    <div className="p-4 rounded-xl bg-primary/10 border border-primary/30 h-64 overflow-y-auto leading-relaxed whitespace-pre-wrap text-white">
+                      {optimizedResult.optimizedPrompt}
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <span className="font-semibold text-primary">KernelX Optimized:</span>
-                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 h-64 overflow-y-auto leading-relaxed whitespace-pre-wrap">
-                    {optimizedResult.optimizedPrompt}
-                  </div>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+              )}
+            </DialogContent>
+          </Dialog>
 
-        {/* Footer */}
-        <footer className="pt-12 border-t border-foreground/10 text-center font-mono text-xs text-foreground/40 space-y-1">
-          <p>KernelX Prompt © 2026 • AI Intelligence System</p>
-        </footer>
+          {/* Footer */}
+          <footer className="pt-8 border-t border-white/10 text-center font-mono text-xs text-white/40">
+            <p>KernelX Prompt © 2026 • AI Intelligence System</p>
+          </footer>
+        </div>
       </div>
     </FlowField>
   );
