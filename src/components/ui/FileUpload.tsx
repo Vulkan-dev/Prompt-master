@@ -34,7 +34,7 @@ const formatBytes = (bytes: number, decimals = 2): string => {
 };
 
 const UploadIllustration = () => (
-  <div className="relative h-16 w-16 mx-auto">
+  <div className="relative h-12 w-12 sm:h-16 sm:w-16 mx-auto">
     <svg
       aria-label="Upload illustration"
       className="h-full w-full"
@@ -152,8 +152,8 @@ export default function FileUpload({
   };
 
   return (
-    <div className={cn("w-full", className)}>
-      <div className="glass-card premium-border rounded-2xl p-6 text-center relative overflow-hidden">
+    <div className={cn("w-full max-w-full overflow-hidden", className)}>
+      <div className="glass-card border border-white/15 rounded-2xl p-4 sm:p-6 md:p-8 text-center relative overflow-hidden">
         <input
           ref={fileInputRef}
           accept={acceptedFileTypes.join(",")}
@@ -168,10 +168,10 @@ export default function FileUpload({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="py-6 space-y-3"
+              className="py-4 sm:py-6 space-y-3"
             >
-              <div className="w-12 h-12 mx-auto rounded-full border-2 border-primary border-t-transparent animate-spin" />
-              <p className="font-mono text-sm text-foreground/80 font-medium">Processing {file?.name}</p>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto rounded-full border-2 border-primary border-t-transparent animate-spin" />
+              <p className="font-mono text-xs sm:text-sm text-foreground/80 font-medium truncate max-w-full px-2">Processing {file?.name}</p>
               <p className="font-mono text-xs text-primary font-bold">{progress}%</p>
             </motion.div>
           ) : (
@@ -181,24 +181,24 @@ export default function FileUpload({
               onDragLeave={handleDragLeave}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
-              className="space-y-4"
+              className="space-y-3 sm:space-y-4"
             >
               <UploadIllustration />
               <div className="space-y-1">
-                <h4 className="font-medium text-base text-foreground">
-                  Drag and drop image or text file
+                <h4 className="font-medium text-sm sm:text-base text-foreground">
+                  Drag & drop target image file
                 </h4>
-                <p className="text-xs text-foreground/50 font-light">
-                  Supports PNG, JPG, WEBP, TXT up to {formatBytes(maxFileSize)}
+                <p className="text-[11px] sm:text-xs text-foreground/50 font-light">
+                  Supports PNG, JPG, WEBP up to {formatBytes(maxFileSize)}
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-mono text-xs font-semibold hover:opacity-90 transition-all shadow-md"
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 min-h-[44px] rounded-xl bg-primary text-primary-foreground font-mono text-xs font-semibold hover:opacity-90 transition-all shadow-md cursor-pointer"
               >
-                <span>Browse Local File</span>
+                <span>Browse Image File</span>
                 <UploadCloud className="w-4 h-4" />
               </button>
 

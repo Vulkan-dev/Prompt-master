@@ -168,33 +168,33 @@ export default function KernelXPromptEngine() {
 
   return (
     <FlowField theme="aurora" density="medium">
-      <div className="min-h-screen relative z-10 px-4 md:px-8 py-10 max-w-6xl mx-auto">
+      <div className="min-h-screen relative z-10 px-2 sm:px-4 md:px-8 py-4 sm:py-8 max-w-[min(100%-1rem,1440px)] mx-auto">
         
         {/* Main Liquid Glass Shell Container */}
-        <div className="liquid-glass rounded-3xl p-6 md:p-10 space-y-8 relative overflow-hidden">
+        <div className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 space-y-6 sm:space-y-8 relative overflow-hidden">
           
           {/* Header */}
-          <header className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-white/10">
+          <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 sm:pb-6 border-b border-white/10">
             <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400 drop-shadow-sm">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight font-mono text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400 drop-shadow-sm">
                   KernelX Prompt
                 </h1>
-                <Badge variant="outline" className="text-xs font-mono border-primary/50 text-primary bg-primary/10 px-2.5 py-0.5">
+                <Badge variant="outline" className="text-[11px] sm:text-xs font-mono border-primary/50 text-primary bg-primary/10 px-2 sm:px-2.5 py-0.5">
                   v3.4 PRO
                 </Badge>
               </div>
-              <p className="text-xs md:text-sm text-white/70 font-light mt-1">
+              <p className="text-xs sm:text-sm text-white/70 font-light mt-1">
                 Advanced AI Prompt Intelligence & Optimization System
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 self-end sm:self-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-                className="font-mono text-xs gap-2 border-white/15 bg-white/5 hover:bg-white/10 text-white"
+                className="font-mono text-xs gap-2 border-white/15 bg-white/5 hover:bg-white/10 text-white min-h-[40px]"
               >
                 <History className="h-4 w-4" />
                 Logs ({history.length})
@@ -203,16 +203,16 @@ export default function KernelXPromptEngine() {
           </header>
 
           {/* Feature Tabs (3 Focused Modes) */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-8">
-            <TabsList className="grid grid-cols-3 gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10">
-              <TabsTrigger value="audit" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
-                <Zap className="h-3.5 w-3.5" /> Audit & Score
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6 sm:space-y-8">
+            <TabsList className="grid grid-cols-3 gap-1 sm:gap-2 bg-black/40 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-white/10">
+              <TabsTrigger value="audit" className="font-mono text-[11px] sm:text-xs font-medium gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg sm:rounded-xl min-h-[38px]">
+                <Zap className="h-3.5 w-3.5" /> <span className="hidden xs:inline">Audit & Score</span><span className="xs:hidden">Audit</span>
               </TabsTrigger>
-              <TabsTrigger value="factory" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
+              <TabsTrigger value="factory" className="font-mono text-[11px] sm:text-xs font-medium gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg sm:rounded-xl min-h-[38px]">
                 <Sparkles className="h-3.5 w-3.5" /> Enhancer
               </TabsTrigger>
-              <TabsTrigger value="vision" className="font-mono text-xs font-medium gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl">
-                <Eye className="h-3.5 w-3.5" /> Image to Prompt
+              <TabsTrigger value="vision" className="font-mono text-[11px] sm:text-xs font-medium gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg sm:rounded-xl min-h-[38px]">
+                <Eye className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Image to Prompt</span><span className="sm:hidden">Vision</span>
               </TabsTrigger>
             </TabsList>
 
@@ -236,14 +236,14 @@ export default function KernelXPromptEngine() {
                     <span>{prompt.split(/\s+/).filter(Boolean).length} words</span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {activeTab === 'audit' && (
                       <>
                         <LiquidButton onClick={handleAnalyze} disabled={isProcessing || !prompt.trim()}>
                           {isProcessing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
                           Audit Score
                         </LiquidButton>
-                        <Button variant="outline" onClick={handleOptimize} disabled={isProcessing || !prompt.trim()} className="font-mono text-xs border-white/20 text-white hover:bg-white/10">
+                        <Button variant="outline" onClick={handleOptimize} disabled={isProcessing || !prompt.trim()} className="font-mono text-xs border-white/20 text-white hover:bg-white/10 min-h-[44px]">
                           <Sparkles className="h-4 w-4 mr-2 text-primary" />
                           Auto-Optimize
                         </Button>
@@ -277,12 +277,12 @@ export default function KernelXPromptEngine() {
             {/* TAB 1: AUDIT & SCORE */}
             <TabsContent value="audit" className="space-y-6 pt-2">
               {analysisResult && (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
                   {/* Score Card */}
-                  <LiquidGlassCard className="lg:col-span-4 flex flex-col items-center justify-center p-8 text-center space-y-4">
+                  <LiquidGlassCard className="lg:col-span-4 flex flex-col items-center justify-center p-6 sm:p-8 text-center space-y-4">
                     <span className="text-xs font-mono uppercase tracking-widest text-white/60">Overall Quality Score</span>
-                    <div className="relative flex items-center justify-center w-36 h-36 rounded-full border-4 border-primary/40 bg-primary/10 shadow-lg">
-                      <span className={`font-mono text-5xl font-extrabold ${analysisResult.overallScore >= 80 ? 'text-emerald-400' : analysisResult.overallScore >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                    <div className="relative flex items-center justify-center w-28 h-28 sm:w-36 sm:h-36 rounded-full border-4 border-primary/40 bg-primary/10 shadow-lg shrink-0">
+                      <span className={`font-mono text-3xl sm:text-5xl font-extrabold ${analysisResult.overallScore >= 80 ? 'text-emerald-400' : analysisResult.overallScore >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
                         {analysisResult.overallScore}
                       </span>
                     </div>
@@ -290,16 +290,16 @@ export default function KernelXPromptEngine() {
                   </LiquidGlassCard>
 
                   {/* Diagnostic Breakdown Card */}
-                  <LiquidGlassCard className="lg:col-span-8 p-6 space-y-4">
-                    <h3 className="font-mono text-sm font-semibold tracking-wider text-white uppercase border-b border-white/10 pb-3">
+                  <LiquidGlassCard className="lg:col-span-8 p-4 sm:p-6 space-y-4">
+                    <h3 className="font-mono text-xs sm:text-sm font-semibold tracking-wider text-white uppercase border-b border-white/10 pb-3">
                       Diagnostic Criteria Radar
                     </h3>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,180px),1fr))] gap-3 sm:gap-4">
                       {Object.entries(analysisResult.criteria).map(([key, val]) => (
-                        <div key={key} className="p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-2">
+                        <div key={key} className="p-3 sm:p-3.5 rounded-xl bg-black/40 border border-white/10 space-y-2">
                           <div className="flex justify-between font-mono text-xs">
-                            <span className="capitalize font-medium text-white">{key}</span>
+                            <span className="capitalize font-medium text-white truncate max-w-[120px]">{key}</span>
                             <span className="text-primary font-bold">{Number(val)}/10</span>
                           </div>
                           <Progress value={(Number(val) / 10) * 100} className="h-2" />

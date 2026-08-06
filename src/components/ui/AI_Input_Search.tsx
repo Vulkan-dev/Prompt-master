@@ -53,21 +53,21 @@ export default function AI_Input_Search({
   };
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn("w-full max-w-full overflow-hidden", className)}>
       <div className="relative mx-auto w-full">
         <div
           aria-label="Search input container"
           className={cn(
-            "relative flex w-full cursor-text flex-col rounded-2xl text-left transition-all duration-200 glass-card premium-border",
-            isFocused && "ring-2 ring-primary/40 border-primary/50 rich-glow"
+            "relative flex w-full cursor-text flex-col rounded-2xl text-left transition-all duration-200 glass-card border border-white/15",
+            isFocused && "ring-2 ring-primary/50 border-primary rich-glow"
           )}
           onClick={handleContainerClick}
           role="textbox"
           tabIndex={0}
         >
-          <div className="max-h-[260px] overflow-y-auto">
+          <div className="max-h-[260px] overflow-y-auto w-full">
             <Textarea
-              className="w-full resize-none rounded-2xl rounded-b-none border-none bg-transparent px-5 py-4 leading-relaxed text-foreground placeholder:text-foreground/40 font-mono text-sm focus-visible:ring-0"
+              className="w-full resize-none rounded-2xl rounded-b-none border-none bg-transparent px-4 sm:px-5 py-3 sm:py-4 leading-relaxed text-foreground placeholder:text-foreground/40 font-mono text-xs sm:text-sm focus-visible:ring-0"
               id="kernelx-ai-input"
               onBlur={() => setIsFocused(false)}
               onChange={(e) => handleTextChange(e.target.value)}
@@ -84,14 +84,14 @@ export default function AI_Input_Search({
             />
           </div>
 
-          <div className="h-14 rounded-b-2xl border-t border-foreground/10 bg-foreground/[0.02] flex items-center justify-between px-4">
-            <div className="flex items-center gap-3">
+          <div className="min-h-[52px] py-2 rounded-b-2xl border-t border-white/10 bg-white/[0.02] flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4">
+            <div className="flex items-center gap-2">
               <button
                 className={cn(
-                  "flex h-8 cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-xs font-mono transition-all",
+                  "flex h-9 cursor-pointer items-center gap-2 rounded-full border px-3 text-xs font-mono transition-all min-h-[36px]",
                   showSearch
                     ? "border-primary/40 bg-primary/15 text-primary font-medium"
-                    : "border-foreground/10 bg-foreground/5 text-foreground/60 hover:text-foreground"
+                    : "border-white/10 bg-white/5 text-white/60 hover:text-white"
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -135,13 +135,13 @@ export default function AI_Input_Search({
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-auto">
               <button
                 className={cn(
-                  "flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-mono font-medium transition-all shadow-md",
+                  "flex items-center gap-2 rounded-xl px-4 py-2 min-h-[40px] text-xs font-mono font-medium transition-all shadow-md",
                   value.trim()
                     ? "bg-primary text-primary-foreground hover:opacity-90 cursor-pointer"
-                    : "bg-foreground/10 text-foreground/40 cursor-not-allowed"
+                    : "bg-white/10 text-white/40 cursor-not-allowed"
                 )}
                 onClick={(e) => {
                   e.stopPropagation();

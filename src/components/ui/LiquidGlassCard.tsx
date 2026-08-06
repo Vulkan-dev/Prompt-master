@@ -2,22 +2,16 @@ import React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const GLASS_SHADOW_LIGHT =
-  "shadow-[0_0_8px_rgba(0,0,0,0.03),0_2px_8px_rgba(0,0,0,0.08),inset_1px_1px_1px_rgba(255,255,255,0.4)]";
-
-const GLASS_SHADOW_DARK =
-  "dark:shadow-[0_0_12px_rgba(0,0,0,0.4),inset_1px_1px_1px_rgba(255,255,255,0.15)]";
-
-const GLASS_SHADOW = `${GLASS_SHADOW_LIGHT} ${GLASS_SHADOW_DARK}`;
+const GLASS_SHADOW = "shadow-[0_0_12px_rgba(0,0,0,0.4),inset_1px_1px_1px_rgba(255,255,255,0.15)]";
 
 const liquidGlassCardVariants = cva(
-  "group relative overflow-hidden bg-card/60 backdrop-blur-xl border border-foreground/15 rounded-2xl transition-all duration-300",
+  "group relative overflow-hidden bg-card/60 backdrop-blur-xl border border-white/15 rounded-2xl transition-all duration-300 max-w-full",
   {
     variants: {
       glassSize: {
-        sm: "p-4",
-        default: "p-6",
-        lg: "p-8",
+        sm: "p-3 sm:p-4",
+        default: "p-4 sm:p-6 md:p-8",
+        lg: "p-6 sm:p-8 md:p-10",
       },
     },
     defaultVariants: {
@@ -49,7 +43,7 @@ export function LiquidGlassCard({
           GLASS_SHADOW
         )}
       />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 w-full">{children}</div>
     </div>
   );
 }
@@ -68,7 +62,7 @@ export function LiquidButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-mono text-xs font-semibold tracking-wide transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-md",
+        "relative inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2.5 rounded-xl font-mono text-xs font-semibold tracking-wide transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer",
         "bg-primary text-primary-foreground hover:opacity-90",
         className
       )}
