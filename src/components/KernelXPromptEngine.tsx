@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Sparkles, ShieldCheck, CheckCircle2, Copy, RefreshCw, Zap, Eye, Split, Download, History, AlertTriangle } from 'lucide-react';
+import { Sparkles, ShieldCheck, CheckCircle2, Copy, RefreshCw, Zap, Eye, Split, Download, History, AlertTriangle, Trash2, X } from 'lucide-react';
 
 import FlowField from './ui/FlowField';
 import AI_Input_Search from './ui/AI_Input_Search';
@@ -435,6 +435,66 @@ export default function KernelXPromptEngine() {
                       {optimizedResult.optimizedPrompt}
                     </div>
                   </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Execution History Logs Modal */}
+          <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+            <DialogContent className="max-w-2xl glass-card border border-white/20 p-6 space-y-4">
+              <DialogHeader className="flex flex-row items-center justify-between border-b border-white/10 pb-3">
+                <DialogTitle className="font-mono text-base font-bold flex items-center gap-2 text-white">
+                  <History className="h-5 w-5 text-primary" /> Execution Logs Matrix
+                </DialogTitle>
+                {history.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setHistory([]);
+                      localStorage.removeItem('kernelx_history');
+                    }}
+                    className="font-mono text-xs border-red-500/30 text-red-400 hover:bg-red-500/10 mr-6"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 mr-1" /> Clear Logs
+                  </Button>
+                )}
+              </DialogHeader>
+
+              {history.length > 0 ? (
+                <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                  {history.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setPrompt(item.original);
+                        setIsHistoryOpen(false);
+                      }}
+                      className="p-4 rounded-xl bg-black/50 border border-white/10 hover:border-primary/50 transition-all cursor-pointer space-y-2 group"
+                    >
+                      <div className="flex items-center justify-between text-xs font-mono">
+                        <span className="text-primary font-medium">{item.mode} • {item.timestamp}</span>
+                        <Badge variant="outline" className="border-emerald-500/40 text-emerald-400 font-mono text-[10px]">
+                          Score: {item.score}/100
+                        </Badge>
+                      </div>
+                      <p className="font-mono text-xs text-white/90 truncate font-light group-hover:text-white">
+                        {item.original}
+                      </p>
+                      {item.optimized && (
+                        <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20 text-[11px] font-mono text-primary truncate">
+                          ✨ {item.optimized}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-10 text-center font-mono text-xs text-white/50 space-y-2">
+                  <History className="h-8 w-8 mx-auto opacity-40 text-primary" />
+                  <p>No past prompt executions logged yet.</p>
+                  <p className="text-[11px] text-white/30">Past audits and optimizations will be recorded here.</p>
                 </div>
               )}
             </DialogContent>
