@@ -1,14 +1,9 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import PromptJudge from './components/PromptJudge';
+import KernelXPromptEngine from './components/KernelXPromptEngine';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
-      <PromptJudge />
+    <div className="min-h-screen bg-[#030712] text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200">
+      <KernelXPromptEngine />
     </div>
   );
 }

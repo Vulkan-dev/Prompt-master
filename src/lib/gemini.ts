@@ -76,7 +76,7 @@ async function callOpenRouter(
           "Content-Type": "application/json",
           "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
           "HTTP-Referer": origin,
-          "X-Title": "Promptraitz",
+          "X-Title": "KernelX-Prompt",
         },
         body: JSON.stringify({
           model,
