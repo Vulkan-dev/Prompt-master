@@ -1,0 +1,181 @@
+import React, { useState, useRef } from "react";
+import { Globe, Paperclip, Send, Sparkles } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Textarea } from "../../../components/ui/textarea";
+import { useAutoResizeTextarea } from "../../hooks/use-auto-resize-textarea";
+import { cn } from "@/lib/utils";
+
+interface AIInputSearchProps {
+  placeholder?: string;
+  searchLabel?: string;
+  onSubmit?: (value: string) => void;
+  onFileSelect?: (file: File) => void;
+  value?: string;
+  onChange?: (val: string) => void;
+  className?: string;
+}
+
+export default function AI_Input_Search({
+  placeholder = "Enter your prompt instruction for KernelX...",
+  searchLabel = "Enhance Mode",
+  onSubmit,
+  onFileSelect,
+  value: externalValue,
+  onChange: externalOnChange,
+  className,
+}: AIInputSearchProps) {
+  const [internalValue, setInternalValue] = useState("");
+  const value = externalValue !== undefined ? externalValue : internalValue;
+
+  const { textareaRef, adjustHeight } = useAutoResizeTextarea({
+    minHeight: 80,
+    maxHeight: 280,
+  });
+  const [showSearch, setShowSearch] = useState(true);
+  const [isFocused, setIsFocused] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleTextChange = (val: string) => {
+    if (externalOnChange) {
+      externalOnChange(val);
+    } else {
+      setInternalValue(val);
+    }
+    adjustHeight();
+  };
+
+  const handleSubmit = () => {
+    if (!value.trim()) return;
+    onSubmit?.(value);
+  };
+
+  const handleContainerClick = () => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      onFileSelect?.(e.target.files[0]);
+    }
+  };
+
+  return (
+    <div className={cn("w-full", className)}>
+      <div className="relative mx-auto w-full">
+        <div
+          aria-label="Search input container"
+          className={cn(
+            "relative flex w-full cursor-text flex-col rounded-2xl text-left transition-all duration-200 glass-card premium-border",
+            isFocused && "ring-2 ring-primary/40 border-primary/50 rich-glow"
+          )}
+          onClick={handleContainerClick}
+          role="textbox"
+          tabIndex={0}
+        >
+          <div className="max-h-[280px] overflow-y-auto">
+            <Textarea
+              className="w-full resize-none rounded-2xl rounded-b-none border-none bg-transparent px-5 py-4 leading-relaxed text-foreground placeholder:text-foreground/40 font-mono text-sm focus-visible:ring-0"
+              id="kernelx-ai-input"
+              onBlur={() => setIsFocused(false)}
+              onChange={(e) => handleTextChange(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+              placeholder={placeholder}
+              ref={textareaRef}
+              value={value}
+            />
+          </div>
+
+          <div className="h-14 rounded-b-2xl border-t border-foreground/10 bg-foreground/[0.02] flex items-center justify-between px-4">
+            <div className="flex items-center gap-3">
+              <label className="cursor-pointer rounded-lg bg-foreground/5 p-2 hover:bg-foreground/10 transition-all text-foreground/70 hover:text-foreground">
+                <input
+                  ref={fileInputRef}
+                  className="hidden"
+                  type="file"
+                  onChange={handleFileChange}
+                />
+                <Paperclip className="h-4 w-4" />
+              </label>
+
+              <button
+                className={cn(
+                  "flex h-8 cursor-pointer items-center gap-2 rounded-full border px-3 py-1 text-xs font-mono transition-all",
+                  showSearch
+                    ? "border-primary/40 bg-primary/15 text-primary font-medium"
+                    : "border-foreground/10 bg-foreground/5 text-foreground/60 hover:text-foreground"
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowSearch(!showSearch);
+                }}
+                type="button"
+              >
+                <div className="flex h-4 w-4 shrink-0 items-center justify-center">
+                  <motion.div
+                    animate={{
+                      rotate: showSearch ? 180 : 0,
+                      scale: showSearch ? 1.1 : 1,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 260,
+                      damping: 25,
+                    }}
+                  >
+                    <Globe
+                      className={cn(
+                        "h-3.5 w-3.5",
+                        showSearch ? "text-primary" : "text-inherit"
+                      )}
+                    />
+                  </motion.div>
+                </div>
+                <AnimatePresence>
+                  {showSearch && (
+                    <motion.span
+                      animate={{ width: "auto", opacity: 1 }}
+                      className="shrink-0 overflow-hidden whitespace-nowrap text-xs text-primary font-medium"
+                      exit={{ width: 0, opacity: 0 }}
+                      initial={{ width: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {searchLabel}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                className={cn(
+                  "flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-mono font-medium transition-all shadow-md",
+                  value.trim()
+                    ? "bg-primary text-primary-foreground hover:opacity-90 cursor-pointer"
+                    : "bg-foreground/10 text-foreground/40 cursor-not-allowed"
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSubmit();
+                }}
+                disabled={!value.trim()}
+                type="button"
+              >
+                <span>Execute Kernel</span>
+                <Send className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
