@@ -623,12 +623,12 @@ export default function KernelXPromptEngine() {
                           <div key={key} className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 space-y-1.5">
                             <div className="flex justify-between text-xs font-mono">
                               <span className="capitalize text-slate-300">{key}</span>
-                              <span className="text-cyan-400 font-bold">{val}/10</span>
+                              <span className="text-cyan-400 font-bold">{Number(val)}/10</span>
                             </div>
                             <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 rounded-full transition-all duration-500"
-                                style={{ width: `${(val / 10) * 100}%` }}
+                                style={{ width: `${(Number(val) / 10) * 100}%` }}
                               />
                             </div>
                           </div>
